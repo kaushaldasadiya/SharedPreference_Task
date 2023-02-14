@@ -1,0 +1,148 @@
+import 'dart:math';
+
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  // This widget is the root of your application.
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: const MyHomePage(),
+    );
+  }
+}
+
+class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key});
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  List changeBGColor = [
+    Colors.white,
+    Colors.red,
+    Colors.green,
+    Colors.blue,
+    Colors.black,
+    Colors.amber,
+    Colors.brown,
+    Colors.cyan,
+    Colors.deepOrange,
+    Colors.deepPurple,
+    Colors.teal,
+    Colors.indigo,
+    Colors.pink
+  ];
+  int colorIndex = 0;
+  Random randomNumber = Random();
+  get randomNumberIndex => randomNumber.nextInt(changeBGColor.length);
+
+  @override
+  void initState() {
+    super.initState();
+    loadBgColor();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Shared Preference'),
+      ),
+      body: Container(
+        color: changeBGColor[colorIndex],
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    elevation: 7,
+                  ),
+                  onPressed: () {
+                    colorIndex = 1;
+                    changeBgColor();
+                  },
+                  child: const Text('Red'),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    elevation: 7,
+                  ),
+                  onPressed: () {
+                    colorIndex = 2;
+                    changeBgColor();
+                  },
+                  child: const Text('Green'),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    elevation: 7,
+                  ),
+                  onPressed: () {
+                    colorIndex = 3;
+                    changeBgColor();
+                  },
+                  child: const Text('Blue'),
+                ),
+              ],
+            ),
+            const SizedBox(
+              height: 50,
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: changeBGColor[colorIndex],
+                elevation: 7,
+                shape: const CircleBorder(),
+                fixedSize: const Size(100, 100),
+              ),
+              onPressed: () {
+                colorIndex = randomNumberIndex;
+                changeBgColor();
+              },
+              child: const Text(
+                'Random',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void changeBgColor() async {
+    final pref = await SharedPreferences.getInstance();
+    setState(() {
+      pref.setInt('color', colorIndex);
+      colorIndex = pref.getInt('color')!;
+    });
+  }
+
+  void loadBgColor() async {
+    final pref = await SharedPreferences.getInstance();
+    setState(() {
+      colorIndex = pref.getInt('color')!;
+    });
+  }
+}
